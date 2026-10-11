@@ -36,7 +36,7 @@ jobs:
             # A go.mod or go.sum change without a matching vendorHash fails here; name the new hash.
             got=$(awk '/hash mismatch in fixed-output derivation .*-go-modules\.drv/ { m = 1; next } m && $1 == "got:" { print $2; exit }' "$build_log")
             if [[ -n "$got" ]]; then
-              echo "::error file=flake.nix::vendorHash no longer matches go.mod/go.sum. Set vendorHash = \"$got\"; in flake.nix."
+              echo "::error file=package.nix::vendorHash no longer matches go.mod/go.sum. Set vendorHash = \"$got\"; in package.nix."
             fi
           fi
           exit "$status"
