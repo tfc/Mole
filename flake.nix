@@ -18,10 +18,18 @@
       # for users who want to build mole with their own nixpkgs to keep the system closure small
       overlays.default = import ./overlay.nix;
 
+      formatter = builtins.mapAttrs (_system: pkgs: pkgs.callPackage ./formatter.nix { }) darwinPackages;
+
       packages = builtins.mapAttrs (system: pkgs: {
         mole = pkgs.callPackage ./package.nix { };
         default = inputs.self.packages.${system}.mole;
       }) darwinPackages;
+
+      checks =
+        builtins.mapAttrs (system: _pkgs: {
+          formatting = inputs.self.formatter.${system}.check inputs.self;
+        }) darwinPackages
+        // inputs.self.packages;
 
       apps = builtins.mapAttrs (system: _pkgs: {
         mole = {
@@ -62,6 +70,7 @@
             zip # optional test dependency (installer_zip.bats)
             unzip
             git
+            inputs.self.formatter.${system} # run all formatters/linters with `treefmt`
           ];
         };
       }) darwinPackages;
